@@ -1,10 +1,10 @@
-# 🏺 Aura Decor — Online Personalized Home Décor Store
+# 🏺 KAYA — Online Personalized Home Décor Store
 
 [![Laravel Version](https://img.shields.io/badge/Laravel-v11.x-red.svg?style=flat-square&logo=laravel)](https://laravel.com)
 [![Vite](https://img.shields.io/badge/Vite-v5.x-purple.svg?style=flat-square&logo=vite)](https://vitejs.dev)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v3.x-38bdf8.svg?style=flat-square&logo=tailwind-css)](https://tailwindcss.com)
 
-**Aura Decor** is a premium, high-end co-creation and purchasing platform designed to revolutionize personalized home styling. Powered by standard **Laravel**, **Tailwind CSS**, and **HTML5 Canvas**, it offers users an immersive spatial visualization experience allowing them to preview artisan and custom-made décor directly inside their own homes before making a purchase.
+**KAYA** is a premium, high-end co-creation and purchasing platform designed to revolutionize personalized home styling. Powered by **Laravel**, **Tailwind CSS**, and **HTML5 Canvas**, it offers users an immersive spatial visualization experience allowing them to preview artisan and custom-made décor directly inside their own homes before making a purchase.
 
 ---
 
@@ -29,6 +29,11 @@
 *   **Realistic Transaction Loop**: Integrated mock Razorpay payment gateway UI.
 *   **Payment & Order Lifecycle**: Clears user carts, processes order records in the SQLite database, and redirects to a gorgeous Curated Order timeline confirmation page.
 
+### 📊 5. Operations Command Centre (Admin Portal)
+*   **Clientele Directory**: Manage administrators and customer curators with real-time switching, role indicators, and search.
+*   **Orders & Transactions Ledger**: Update order status (Placed, Processing, Shipping, Delivered, Cancelled) and view customer payment keys.
+*   **Products Curation Ledger**: Add and manage artwork collections, stock levels, and store visibility.
+
 ---
 
 ## 🛠️ Technology Stack
@@ -41,12 +46,12 @@
 
 ## 🚀 Local Installation & Quick Setup
 
-Follow these simple steps to spin up Aura Decor locally:
+Follow these simple steps to spin up KAYA locally:
 
 ### 1. Clone & Access the Workspace
 ```bash
-git clone https://github.com/mahendrakumarsingh/Online-Personalized-Home-D-cor-Store.git
-cd Online-Personalized-Home-D-cor-Store
+git clone https://github.com/saithevfrvrygngreat/KAYA.git
+cd KAYA
 ```
 
 ### 2. Install Project Dependencies
@@ -86,10 +91,15 @@ Open `http://127.0.0.1:8000` in your web browser.
 ---
 
 ## 🔐 Demonstration Credentials
-You can log in instantly with the seeded developer account to explore the entire purchase, customizer, and order history flow:
+You can log in instantly with the seeded developer accounts to explore the customer visualizer or the administration portal:
 
+### 👤 Customer curator
 *   **Email**: `test@example.com`
 *   **Password**: `password`
+
+### 🔑 Administrator
+*   **Email**: `Nandinigottipati2004@gmail.com`
+*   **Password**: `Nandhini@2004`
 
 ---
 
