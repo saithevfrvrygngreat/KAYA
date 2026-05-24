@@ -20,7 +20,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Check if running in a Vercel serverless environment
-        if (env('VERCEL') || strpos(env('APP_URL', ''), 'vercel') !== false) {
+        if (env('VERCEL') || isset($_SERVER['VERCEL']) || isset($_ENV['VERCEL']) || (isset($_SERVER['HTTP_HOST']) && strpos($_SERVER['HTTP_HOST'], 'vercel.app') !== false) || strpos(env('APP_URL', ''), 'vercel') !== false) {
             
             // 1. Dynamic Writable SQLite Database
             if (config('database.default') === 'sqlite') {
