@@ -894,7 +894,13 @@ export default function DashboardPage() {
                 {orders.map((order) => {
                   const firstItemImage = order.cart_items?.[0]?.image || 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=400&q=80';
                   const imgUrl = order.custom_design?.room_image_path
-                    ? `http://localhost:5000/uploads/rooms/${order.custom_design.room_image_path}`
+                    ? (order.custom_design.room_image_path.startsWith('http')
+                        ? order.custom_design.room_image_path
+                        : (order.custom_design.room_image_path.startsWith('/')
+                            ? order.custom_design.room_image_path
+                            : (order.custom_design.room_image_path.startsWith('uploads/')
+                                ? `/${order.custom_design.room_image_path}`
+                                : `/uploads/rooms/${order.custom_design.room_image_path}`)))
                     : firstItemImage;
 
                   const title = order.custom_design?.product?.name ||

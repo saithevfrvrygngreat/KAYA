@@ -1,106 +1,20 @@
 const mongoose = require('mongoose');
-const net = require('net');
-const path = require('path');
-const fs = require('fs');
-const { spawn, execSync } = require('child_process');
 
-function isPortListening(port, host = '127.0.0.1') {
-  return new Promise((resolve) => {
-    const socket = new net.Socket();
-    socket.setTimeout(800);
-    socket.on('connect', () => {
-      socket.destroy();
-      resolve(true);
-    });
-    socket.on('timeout', () => {
-      socket.destroy();
-      resolve(false);
-    });
-    socket.on('error', () => {
-      resolve(false);
-    });
-    socket.connect(port, host);
-  });
-}
+/**
+ * Connect to MongoDB Atlas (or local MongoDB in development)
+ * @param {number} retries - Number of connection attempts before failing
+ * @param {number} delay - Delay between retries in milliseconds
+ */
+const connectDB = async (retries = 5, delay = 3000) => {
+  const uri = process.env.MONGODB_URI;
 
-function findMongodBinary() {
-  const candidates = [
-    'C:\\Program Files\\MongoDB\\Server\\8.3\\bin\\mongod.exe',
-    'C:\\Program Files\\MongoDB\\Server\\8.2\\bin\\mongod.exe',
-    'C:\\Program Files\\MongoDB\\Server\\8.0\\bin\\mongod.exe',
-    'C:\\Program Files\\MongoDB\\Server\\7.0\\bin\\mongod.exe',
-    'mongod',
-  ];
-  for (const c of candidates) {
-    if (c === 'mongod') {
-      try {
-        execSync('mongod --version', { stdio: 'ignore' });
-        return 'mongod';
-      } catch {}
-    } else if (fs.existsSync(c)) {
-      return c;
-    }
-  }
-  return null;
-}
-
-async function ensureLocalMongoRunning() {
-  const isUp = await isPortListening(27017);
-  if (isUp) {
-    return true;
+  if (!uri) {
+    const errorMsg = '❌ FATAL: MONGODB_URI environment variable is not defined. Please configure MONGODB_URI in Render dashboard or .env file.';
+    console.error(errorMsg);
+    throw new Error(errorMsg);
   }
 
-  const mongodPath = findMongodBinary();
-  if (!mongodPath) {
-    return false;
-  }
-
-  const dbPath = path.resolve(__dirname, '../../../.mongodb_data/db');
-  const logPath = path.resolve(__dirname, '../../../.mongodb_data/mongod.log');
-  if (!fs.existsSync(dbPath)) fs.mkdirSync(dbPath, { recursive: true });
-
-  // Clean stale lock if previous process crashed
-  const lockFile = path.join(dbPath, 'mongod.lock');
-  if (fs.existsSync(lockFile)) {
-    try {
-      fs.writeFileSync(lockFile, '');
-    } catch {}
-  }
-
-  console.log(`\x1b[32m[MONGO]\x1b[0m Starting local MongoDB daemon (${mongodPath})...`);
-  try {
-    const proc = spawn(mongodPath, [
-      '--port', '27017',
-      '--dbpath', dbPath,
-      '--logpath', logPath,
-      '--logappend',
-      '--bind_ip', '127.0.0.1',
-      '--setParameter', 'diagnosticDataCollectionEnabled=false'
-    ], { stdio: 'ignore', detached: true });
-    proc.unref();
-
-    // Wait up to 5s for port to open
-    for (let i = 0; i < 10; i++) {
-      await new Promise((r) => setTimeout(r, 500));
-      if (await isPortListening(27017)) {
-        console.log(`\x1b[32m[MONGO]\x1b[0m Local MongoDB started successfully on 127.0.0.1:27017`);
-        return true;
-      }
-    }
-  } catch (err) {
-    console.warn('Could not auto-start mongod:', err.message);
-  }
-  return false;
-}
-
-const connectDB = async (retries = 5, delay = 2000) => {
-  const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/kaya';
   const isLocal = uri.includes('127.0.0.1') || uri.includes('localhost');
-
-  // If local mongo uri, verify/start local mongod
-  if (isLocal) {
-    await ensureLocalMongoRunning();
-  }
 
   // Handle Mongoose connection events
   mongoose.connection.on('connected', () => {
@@ -116,26 +30,28 @@ const connectDB = async (retries = 5, delay = 2000) => {
   });
 
   const connectOptions = {
-    serverSelectionTimeoutMS: 10000,
+    serverSelectionTimeoutMS: 15000,
   };
+
+  // Enforce IPv4 only for local mongod instances to prevent IPv6 loopback binding issues;
+  // Never pass family: 4 for remote mongodb+srv:// Atlas URIs to prevent OpenSSL TLS alert 80.
   if (isLocal) {
-    connectOptions.family = 4; // Enforce IPv4 for local mongod only
+    connectOptions.family = 4;
   }
 
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
+      console.log(`📡 Connecting to MongoDB (Attempt ${attempt}/${retries})...`);
       await mongoose.connect(uri, connectOptions);
       return mongoose.connection;
     } catch (error) {
-      console.warn(`⚠️ MongoDB connection attempt ${attempt}/${retries} failed (${error.message}).`);
+      console.warn(`⚠️ MongoDB connection attempt ${attempt}/${retries} failed: ${error.message}`);
       if (attempt < retries) {
         console.log(`   Retrying in ${delay / 1000}s...`);
         await new Promise((res) => setTimeout(res, delay));
       } else {
-        console.warn('⚠️ Could not establish immediate connection to MongoDB.');
-        console.warn('   The KaYa Express server will stay alive and retry in the background.');
-        console.warn('   To run MongoDB manually: npm run mongo');
-        // Do not call process.exit(1) so the backend server stays running!
+        console.error('❌ FATAL: Could not establish connection to MongoDB after maximum retries.');
+        throw error;
       }
     }
   }

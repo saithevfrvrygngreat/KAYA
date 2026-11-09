@@ -2,6 +2,7 @@ require('dotenv').config({ path: require('path').join(__dirname, '.env') });
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const connectDB = require('./src/config/db');
 
 const authRoutes = require('./src/routes/auth');
@@ -13,33 +14,50 @@ const adminRoutes = require('./src/routes/admin');
 
 const app = express();
 
-// Connect to MongoDB and auto-seed if empty
-connectDB().then(async () => {
-  try {
-    const Product = require('./src/models/Product');
-    const count = await Product.countDocuments();
-    if (count === 0) {
-      console.log('📦 Database is empty. Auto-seeding initial SQLite data into MongoDB...');
-      const seedAll = require('./src/utils/seed_master');
-      await seedAll();
-    }
-  } catch (err) {
-    console.warn('Auto-seed check note:', err.message);
-  }
-}).catch(() => {});
+// ==========================================
+// 1. CORS Configuration
+// ==========================================
+const allowedOrigins = [
+  'https://kaya-9wta.onrender.com',
+  process.env.CLIENT_URL,
+  'http://localhost:5173',
+  'http://localhost:5000',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:5000',
+].filter(Boolean);
 
-// Middleware
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (e.g. mobile apps, curl, or same-origin requests in production)
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    // In production on Render, the React frontend is served from the same origin, so same-origin is allowed
+    return callback(null, true);
+  },
   credentials: true,
 }));
+
+// ==========================================
+// 2. Request Parsers
+// ==========================================
 app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ extended: true, limit: '20mb' }));
 
-// Serve uploaded files statically
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// ==========================================
+// 3. Static Uploads
+// ==========================================
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  try {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  } catch {}
+}
+app.use('/uploads', express.static(uploadsDir));
 
-// Routes
+// ==========================================
+// 4. API Endpoints
+// ==========================================
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
@@ -47,16 +65,39 @@ app.use('/api/designs', designRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/admin', adminRoutes);
 
-// Health check
-app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
+// Health Check
+app.get('/api/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    environment: process.env.NODE_ENV || 'development',
+    timestamp: new Date().toISOString(),
+    uptime: Math.floor(process.uptime()),
+  });
+});
 
-// Serve React frontend static build
-const fs = require('fs');
-const frontendDistPath = path.join(__dirname, '../Frontend/dist');
-const legacyDistPath = path.join(__dirname, '../client/dist');
-const clientDistPath = fs.existsSync(frontendDistPath) ? frontendDistPath : legacyDistPath;
-if (fs.existsSync(clientDistPath)) {
+// Any unmatched /api/* requests return proper JSON 404 (not HTML)
+app.all('/api/*', (req, res) => {
+  res.status(404).json({
+    message: `API endpoint '${req.method} ${req.originalUrl}' not found`,
+  });
+});
+
+// ==========================================
+// 5. Serve Compiled React Frontend (SPA)
+// ==========================================
+const candidateDistDirs = [
+  path.join(__dirname, '../Frontend/dist'),
+  path.join(__dirname, 'public'),
+  path.join(process.cwd(), 'Frontend/dist'),
+  path.join(process.cwd(), 'dist'),
+];
+const clientDistPath = candidateDistDirs.find((dir) => fs.existsSync(dir));
+
+if (clientDistPath) {
+  console.log(`🌐 Serving compiled frontend from: ${clientDistPath}`);
   app.use(express.static(clientDistPath));
+
+  // SPA client-side routing fallback (all non-API and non-uploads routes go to index.html)
   app.get('*', (req, res, next) => {
     if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
       return next();
@@ -65,13 +106,15 @@ if (fs.existsSync(clientDistPath)) {
   });
 } else {
   app.get('/', (req, res) => {
-    res.redirect(process.env.CLIENT_URL || 'http://localhost:5173');
+    res.status(200).send('KaYa Luxury Furniture & Spatial Architecture API is running. (Frontend build not detected)');
   });
 }
 
-// Global error handler
+// ==========================================
+// 6. Global Error Handler
+// ==========================================
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error('Unhandled Server Error:', err.stack || err.message);
   const status = err.status || 500;
   res.status(status).json({
     message: err.message || 'Internal Server Error',
@@ -79,20 +122,24 @@ app.use((err, req, res, next) => {
   });
 });
 
-const PORT = process.env.PORT || 5000;
-const { execSync } = require('child_process');
+// ==========================================
+// 7. Server Initialization & Database Connect
+// ==========================================
+const PORT = parseInt(process.env.PORT, 10) || 5000;
+const HOST = '0.0.0.0';
 
 const startListening = () => {
-  const server = app.listen(PORT, () => {
-    console.log(`✅ KaYa API Server running on http://localhost:${PORT}`);
+  const server = app.listen(PORT, HOST, () => {
+    console.log(`✅ KaYa Server listening on http://${HOST}:${PORT} (NODE_ENV: ${process.env.NODE_ENV || 'development'})`);
   });
 
   server.on('error', (err) => {
     if (err.code === 'EADDRINUSE') {
-      console.warn(`⚠️ Port ${PORT} is already in use by a background process.`);
-      try {
-        if (process.platform === 'win32') {
-          console.log(`🧹 Clearing port ${PORT}...`);
+      console.warn(`⚠️ Port ${PORT} is in use.`);
+      if (process.env.NODE_ENV !== 'production' && process.platform === 'win32') {
+        const { execSync } = require('child_process');
+        try {
+          console.log(`🧹 Attempting local port cleanup on Windows...`);
           const netstatOutput = execSync(`netstat -ano | findstr :${PORT}`).toString();
           const lines = netstatOutput.trim().split('\n');
           for (const line of lines) {
@@ -106,16 +153,15 @@ const startListening = () => {
             }
           }
           setTimeout(() => {
-            app.listen(PORT, () => {
-              console.log(`✅ KaYa API Server successfully started on http://localhost:${PORT}`);
+            app.listen(PORT, HOST, () => {
+              console.log(`✅ KaYa Server listening on http://${HOST}:${PORT}`);
             });
           }, 1000);
           return;
+        } catch (cleanupErr) {
+          console.warn('   Could not auto-clear port:', cleanupErr.message);
         }
-      } catch (killErr) {
-        console.warn(`   Could not auto-release port ${PORT}:`, killErr.message);
       }
-      console.error(`❌ Port ${PORT} is in use. Run 'taskkill /F /IM node.exe' to free it.`);
     } else {
       console.error('❌ Server startup error:', err);
     }
@@ -124,7 +170,38 @@ const startListening = () => {
   return server;
 };
 
-startListening();
+const startServer = async () => {
+  try {
+    // 1. Connect to MongoDB Atlas
+    await connectDB();
+
+    // 2. Auto-seed if database is completely empty
+    try {
+      const Product = require('./src/models/Product');
+      const count = await Product.countDocuments();
+      if (count === 0) {
+        console.log('📦 Database is empty. Auto-seeding initial luxury catalog into MongoDB...');
+        const seedAll = require('./src/utils/seed_master');
+        await seedAll();
+      }
+    } catch (seedErr) {
+      console.warn('Auto-seed check note:', seedErr.message);
+    }
+
+    // 3. Start Express HTTP Server
+    startListening();
+  } catch (err) {
+    console.error('❌ FATAL: Application failed to initialize:', err.message);
+    if (process.env.NODE_ENV === 'production') {
+      process.exit(1);
+    } else {
+      // In development, start server anyway so developer can access error/health
+      console.warn('⚠️ Starting server in degraded mode for development inspection...');
+      startListening();
+    }
+  }
+};
+
+startServer();
 
 module.exports = app;
-
