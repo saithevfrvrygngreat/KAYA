@@ -40,11 +40,10 @@ const optionalAuth = async (req, res, next) => {
   next();
 };
 
-const EXCLUSIVE_ADMIN_EMAIL = 'nandinigottipati2004@gmail.com';
-
 const adminOnly = (req, res, next) => {
-  if (!req.user || !req.user.is_admin || req.user.email?.toLowerCase().trim() !== EXCLUSIVE_ADMIN_EMAIL) {
-    return res.status(403).json({ message: 'Access denied: exclusive administrator privilege required.' });
+  const isAdmin = req.user && (req.user.is_admin === true || req.user.role === 'admin' || req.user.role === 'administrator');
+  if (!isAdmin) {
+    return res.status(403).json({ message: 'Access denied: administrator privileges required.' });
   }
   next();
 };

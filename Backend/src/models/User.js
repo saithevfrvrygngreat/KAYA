@@ -26,6 +26,11 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  role: {
+    type: String,
+    enum: ['user', 'customer', 'admin', 'administrator'],
+    default: 'user',
+  },
   profile_image: {
     type: String,
     default: '',
@@ -81,9 +86,42 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-// Compare password
+// Compare password (supports bcrypt $2a$, $2b$, $2y$, plaintext legacy fallback, and SHA-256)
 userSchema.methods.comparePassword = async function (candidatePassword) {
-  return bcrypt.compare(candidatePassword, this.password);
+  if (!this.password || !candidatePassword) return false;
+
+  const rawCandidate = String(candidatePassword);
+  const trimmedCandidate = rawCandidate.trim();
+
+  // 1. Plaintext direct match (legacy fallback)
+  if (this.password === rawCandidate || this.password === trimmedCandidate) {
+    return true;
+  }
+
+  // 2. Bcrypt comparison ($2a$, $2b$, $2y$ PHP/Laravel)
+  try {
+    const normalizedHash = this.password.startsWith('$2y$')
+      ? this.password.replace('$2y$', '$2a$')
+      : this.password;
+
+    if (await bcrypt.compare(rawCandidate, normalizedHash)) {
+      return true;
+    }
+    if (trimmedCandidate !== rawCandidate && await bcrypt.compare(trimmedCandidate, normalizedHash)) {
+      return true;
+    }
+  } catch (err) {
+    console.warn('[Auth] bcrypt compare warning:', err.message);
+  }
+
+  // 3. SHA-256 fallback (hex 64 chars)
+  if (/^[a-f0-9]{64}$/i.test(this.password)) {
+    const crypto = require('crypto');
+    const sha = crypto.createHash('sha256').update(rawCandidate).digest('hex');
+    if (sha.toLowerCase() === this.password.toLowerCase()) return true;
+  }
+
+  return false;
 };
 
 // Virtual for order count (used in admin)

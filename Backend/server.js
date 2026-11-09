@@ -175,12 +175,16 @@ const startServer = async () => {
     // 1. Connect to MongoDB Atlas
     await connectDB();
 
-    // 2. Auto-seed if database is completely empty
+    // 2. Auto-seed only if database is completely empty (no products and no users)
     try {
       const Product = require('./src/models/Product');
-      const count = await Product.countDocuments();
-      if (count === 0) {
-        console.log('📦 Database is empty. Auto-seeding initial luxury catalog into MongoDB...');
+      const User = require('./src/models/User');
+      const [productCount, userCount] = await Promise.all([
+        Product.countDocuments(),
+        User.countDocuments(),
+      ]);
+      if (productCount === 0 && userCount === 0) {
+        console.log('📦 Database is completely empty. Auto-seeding initial luxury catalog into MongoDB...');
         const seedAll = require('./src/utils/seed_master');
         await seedAll();
       }

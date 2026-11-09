@@ -1,7 +1,7 @@
 # ==========================================================
 # STAGE 1: Build Vite + React Frontend
 # ==========================================================
-FROM node:20-alpine AS frontend-build
+FROM node:20-slim AS frontend-build
 
 WORKDIR /app/Frontend
 
@@ -21,7 +21,10 @@ RUN npm run build
 # ==========================================================
 # STAGE 2: Production Express Backend & Asset Server
 # ==========================================================
-FROM node:20-alpine AS production
+FROM node:20-slim AS production
+
+# Install system certificates and OpenSSL for reliable TLS to MongoDB Atlas
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates openssl wget && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 

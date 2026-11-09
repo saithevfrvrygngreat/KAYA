@@ -3,8 +3,6 @@ import api from '../services/api'
 
 const AuthContext = createContext(null)
 
-const EXCLUSIVE_ADMIN_EMAIL = 'nandinigottipati2004@gmail.com'
-
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -73,7 +71,7 @@ export function AuthProvider({ children }) {
       updateDetails: updateProfile,
       changePassword,
       getDetails,
-      isAdmin: Boolean(user?.is_admin && user?.email?.toLowerCase().trim() === EXCLUSIVE_ADMIN_EMAIL)
+      isAdmin: Boolean(user?.is_admin === true || user?.role === 'admin' || user?.role === 'administrator')
     }}>
       {children}
     </AuthContext.Provider>

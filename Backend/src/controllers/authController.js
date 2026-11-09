@@ -12,26 +12,30 @@ const signToken = (id) => {
   });
 };
 
-const formatUser = (user, details = null) => ({
-  id: user._id,
-  name: user.name,
-  email: user.email,
-  is_admin: user.is_admin,
-  profile_image: details?.profile_image || user.profile_image || '',
-  avatar: details?.avatar || details?.profile_image || user.profile_image || '',
-  phone: details?.phone || user.phone || '',
-  address: details?.address || user.address || '',
-  city: details?.city || user.city || '',
-  state: details?.state || '',
-  postal_code: details?.postal_code || user.postal_code || '',
-  country: details?.country || 'India',
-  bio: details?.bio || user.bio || '',
-  preferred_style: details?.preferred_style || 'Contemporary Minimalist',
-  design_firm: details?.design_firm || '',
-  details_id: details?._id || user.details || null,
-  createdAt: user.createdAt,
-  updatedAt: details?.updatedAt || user.updatedAt,
-});
+const formatUser = (user, details = null) => {
+  const isAdmin = Boolean(user.is_admin === true || user.role === 'admin' || user.role === 'administrator');
+  return {
+    id: user._id,
+    name: user.name,
+    email: user.email,
+    is_admin: isAdmin,
+    role: isAdmin ? 'admin' : (user.role || 'user'),
+    profile_image: details?.profile_image || user.profile_image || '',
+    avatar: details?.avatar || details?.profile_image || user.profile_image || '',
+    phone: details?.phone || user.phone || '',
+    address: details?.address || user.address || '',
+    city: details?.city || user.city || '',
+    state: details?.state || '',
+    postal_code: details?.postal_code || user.postal_code || '',
+    country: details?.country || 'India',
+    bio: details?.bio || user.bio || '',
+    preferred_style: details?.preferred_style || 'Contemporary Minimalist',
+    design_firm: details?.design_firm || '',
+    details_id: details?._id || user.details || null,
+    createdAt: user.createdAt,
+    updatedAt: details?.updatedAt || user.updatedAt,
+  };
+};
 
 // POST /api/auth/register
 const register = async (req, res) => {
@@ -108,10 +112,31 @@ const login = async (req, res) => {
       return res.status(422).json({ message: 'Validation failed', errors: { email: 'Email and password are required.' } });
     }
 
-    const user = await User.findOne({ email: email.toLowerCase().trim() }).select('+password');
-    if (!user || !(await user.comparePassword(password))) {
+    const cleanEmail = String(email).trim();
+    const cleanPassword = String(password);
+
+    // Case-insensitive query to find user across any casing stored in MongoDB Atlas
+    const user = await User.findOne({
+      $or: [
+        { email: cleanEmail.toLowerCase() },
+        { email: cleanEmail },
+        { email: new RegExp(`^${cleanEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
+      ],
+    }).select('+password');
+
+    if (!user) {
+      console.warn(`[Auth] Login rejected: No user record found for email '${cleanEmail}'`);
       return res.status(401).json({ message: 'Validation failed', errors: { email: 'The provided credentials do not match our records.' } });
     }
+
+    const passwordMatch = await user.comparePassword(cleanPassword);
+    if (!passwordMatch) {
+      console.warn(`[Auth] Login rejected: Password mismatch for user '${user.email}'`);
+      return res.status(401).json({ message: 'Validation failed', errors: { email: 'The provided credentials do not match our records.' } });
+    }
+
+    // Determine admin status according to database record
+    const isAdmin = Boolean(user.is_admin === true || user.role === 'admin' || user.role === 'administrator');
 
     // Retrieve or initialize user details
     let details = await UserDetails.findOne({ user: user._id });
@@ -133,8 +158,10 @@ const login = async (req, res) => {
 
     const token = signToken(user._id);
 
+    console.log(`[Auth] User authenticated successfully: ${user.email} (Role: ${isAdmin ? 'Admin' : 'Customer'})`);
+
     res.json({
-      message: user.is_admin ? 'Welcome to the Admin Control Panel!' : 'Logged in successfully!',
+      message: isAdmin ? 'Welcome to the Admin Control Panel!' : 'Logged in successfully!',
       token,
       user: formatUser(user, details),
       details,
