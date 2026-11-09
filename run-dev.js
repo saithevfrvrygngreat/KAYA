@@ -50,6 +50,17 @@ function findMongod() {
 }
 
 async function ensureMongo() {
+  const envPath = fs.existsSync(path.join(__dirname, 'Backend', '.env'))
+    ? path.join(__dirname, 'Backend', '.env')
+    : path.join(__dirname, '.env');
+  const envContent = fs.existsSync(envPath) ? fs.readFileSync(envPath, 'utf-8') : '';
+  const isAtlas = envContent.includes('mongodb+srv://') || process.env.MONGODB_URI?.includes('mongodb+srv://');
+
+  if (isAtlas) {
+    console.log('\x1b[32m[MONGO]\x1b[0m Configured for cloud MongoDB Atlas (no local mongod.exe daemon needed).');
+    return;
+  }
+
   const isRunning = await checkPort(27017);
   if (isRunning) {
     console.log('\x1b[32m[MONGO]\x1b[0m MongoDB is already active on 127.0.0.1:27017');
