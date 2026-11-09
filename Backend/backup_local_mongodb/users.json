@@ -1,0 +1,42 @@
+[
+  {
+    "_id": "6af0486c4b5a0d6c32eeb098",
+    "name": "Dasetti Sai Kumar",
+    "email": "dasettisaikumar@gmail.com",
+    "password": "$2a$12$2uzq4b0EGTOELw1G1dleG.k1bUMjjEoxOOP2S3mWcfdtcE.VGhjx6",
+    "is_admin": false,
+    "email_verified_at": null,
+    "createdAt": "2026-11-08T10:01:16.792Z",
+    "updatedAt": "2026-11-09T01:20:53.942Z",
+    "__v": 0,
+    "address": "9th street",
+    "bio": "",
+    "city": "Nellore",
+    "phone": "+919059245025",
+    "postal_code": "524004",
+    "profile_image": "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80",
+    "details": "6af066a9044f64614933c3aa",
+    "reset_password_expires": null,
+    "reset_password_otp": null
+  },
+  {
+    "_id": "6af094192544b3c992ae66ab",
+    "name": "Nandini Gottipati",
+    "email": "nandinigottipati2004@gmail.com",
+    "password": "$2a$12$bW.ZCiah73aPoNqEDOGXxeRUjU.IzcLgef6XZBoc10XsN4wwFJ4Qi",
+    "is_admin": true,
+    "profile_image": "",
+    "phone": "",
+    "address": "",
+    "city": "",
+    "postal_code": "",
+    "bio": "",
+    "email_verified_at": null,
+    "createdAt": "2026-11-08T15:24:09.046Z",
+    "updatedAt": "2026-11-09T01:16:48.646Z",
+    "__v": 0,
+    "details": "6af094192544b3c992ae66ae",
+    "reset_password_expires": null,
+    "reset_password_otp": null
+  }
+]

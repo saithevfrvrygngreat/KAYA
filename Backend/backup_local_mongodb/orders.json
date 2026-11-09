@@ -1,0 +1,182 @@
+[
+  {
+    "_id": "6aead15f74eac288f80b0bb3",
+    "user": "6aead15e74eac288f80b0ba3",
+    "custom_design": null,
+    "order_number": "ORD-20260520-LBKVP5",
+    "total_price": 1060.82,
+    "status": "placed",
+    "shipping_address": "124 Park Lane, Bangalore",
+    "customer_name": "Test User",
+    "customer_phone": "9876543210",
+    "customer_email": "test@example.com",
+    "cart_items": [
+      {
+        "id": "7",
+        "name": "Bohemian Fairy String Lights",
+        "price": 899,
+        "style": "Signature Collective",
+        "qty": 1,
+        "image": "https://images.unsplash.com/photo-1519751138087-5bf79df62d5b?auto=format&fit=crop&w=700&q=80"
+      }
+    ],
+    "payment_id": "pay_q3ejhukwro6o26",
+    "payment_status": "paid",
+    "placed_at": "2026-05-20T05:50:03.000Z",
+    "createdAt": "2026-11-04T06:31:59.637Z",
+    "updatedAt": "2026-11-08T23:19:57.821Z",
+    "__v": 0
+  },
+  {
+    "_id": "6aead15f74eac288f80b0bb6",
+    "user": null,
+    "custom_design": null,
+    "order_number": "ORD-20260521-ZCNJJ7",
+    "total_price": 1060.82,
+    "status": "processing",
+    "shipping_address": "Suite 404, Regency Tower, Mumbai",
+    "customer_name": "System Administrator",
+    "customer_phone": "9988776655",
+    "customer_email": "admin@example.com",
+    "cart_items": [
+      {
+        "id": "7",
+        "name": "Bohemian Fairy String Lights",
+        "price": 899,
+        "style": "Signature Collective",
+        "qty": 1,
+        "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=700&q=80"
+      }
+    ],
+    "payment_id": "pay_7y0nrg5knft7lm",
+    "payment_status": "paid",
+    "placed_at": "2026-05-21T20:12:07.000Z",
+    "createdAt": "2026-11-04T06:31:59.642Z",
+    "updatedAt": "2026-11-08T09:01:00.427Z",
+    "__v": 0
+  },
+  {
+    "_id": "6aead15f74eac288f80b0bb9",
+    "user": null,
+    "custom_design": null,
+    "order_number": "ORD-20260521-XGIXJO",
+    "total_price": 1060.82,
+    "status": "placed",
+    "shipping_address": "Villa 12, Palm Meadows, Hyderabad",
+    "customer_name": "System Administrator",
+    "customer_phone": "9876501234",
+    "customer_email": "admin@example.com",
+    "cart_items": [
+      {
+        "id": "7",
+        "name": "Bohemian Fairy String Lights",
+        "price": 899,
+        "style": "Signature Collective",
+        "qty": 1,
+        "image": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=700&q=80"
+      }
+    ],
+    "payment_id": "pay_0o4w8dtyaeap30",
+    "payment_status": "paid",
+    "placed_at": "2026-05-21T20:38:09.000Z",
+    "createdAt": "2026-11-04T06:31:59.647Z",
+    "updatedAt": "2026-11-08T09:01:00.429Z",
+    "__v": 0
+  },
+  {
+    "_id": "6af0905037cc55edcdfc2a68",
+    "user": "6af0486c4b5a0d6c32eeb098",
+    "custom_design": null,
+    "order_number": "ORD-20261108-FPDSI1",
+    "total_price": 5543.64,
+    "status": "placed",
+    "shipping_address": "9th street, Nellore, 524004",
+    "customer_name": "Dasetti Sai Kumar",
+    "customer_phone": "+919059245025",
+    "customer_email": "dasettisaikumar@gmail.com",
+    "cart_items": [
+      {
+        "id": "6ae8c5190fc8759437bc1b0b",
+        "name": "Ceramic Bud Vase Set (3)",
+        "price": 1199,
+        "style": "Decorative Accents",
+        "qty": 1,
+        "image": "https://images.unsplash.com/photo-1612196808214-b8e1d6145a8c?auto=format&fit=crop&w=700&q=80"
+      },
+      {
+        "id": "6aead1b763b3a5ac9e985b55",
+        "name": "Artisan Table Lamp",
+        "price": 3499,
+        "style": "Signature Collective",
+        "qty": 1,
+        "image": "https://images.unsplash.com/photo-1540932239986-30128078f3c5?auto=format&fit=crop&w=700&q=80"
+      }
+    ],
+    "payment_id": "pay_fasb0y9dvsk",
+    "payment_status": "paid",
+    "placed_at": "2026-11-08T15:08:00.232Z",
+    "createdAt": "2026-11-08T15:08:00.235Z",
+    "updatedAt": "2026-11-09T00:02:48.641Z",
+    "__v": 0
+  },
+  {
+    "_id": "6af099ec37cc55edcdfc2af8",
+    "user": "6af0486c4b5a0d6c32eeb098",
+    "custom_design": null,
+    "order_number": "ORD-20261108-ZEMOGG",
+    "total_price": 1060.82,
+    "status": "delivered",
+    "shipping_address": "9th street, Nellore, 524004",
+    "customer_name": "Dasetti Sai Kumar",
+    "customer_phone": "+919059245025",
+    "customer_email": "dasettisaikumar@gmail.com",
+    "cart_items": [
+      {
+        "id": "6aead1b763b3a5ac9e985b57",
+        "name": "Bohemian Fairy String Lights",
+        "price": 899,
+        "style": "Lighting",
+        "qty": 1,
+        "image": "/images/masterpiece/fairy_string_lights.png"
+      }
+    ],
+    "payment_id": "pay_wqgq0uuc1fb",
+    "payment_status": "paid",
+    "placed_at": "2026-11-08T15:49:00.589Z",
+    "createdAt": "2026-11-08T15:49:00.602Z",
+    "updatedAt": "2026-11-09T00:20:05.555Z",
+    "__v": 0,
+    "cancelled_at": null,
+    "cancelled_by": null
+  },
+  {
+    "_id": "6af0f7cd37cc55edcdfc3087",
+    "user": "6af0486c4b5a0d6c32eeb098",
+    "custom_design": null,
+    "order_number": "ORD-20261109-4QN1JP",
+    "total_price": 1060.82,
+    "status": "cancelled",
+    "shipping_address": "9th street, Nellore, 524004",
+    "customer_name": "Dasetti Sai Kumar",
+    "customer_phone": "+919059245025",
+    "customer_email": "dasettisaikumar@gmail.com",
+    "cart_items": [
+      {
+        "id": "6aead1b763b3a5ac9e985b57",
+        "name": "Bohemian Fairy String Lights",
+        "price": 899,
+        "style": "Lighting",
+        "qty": 1,
+        "image": "/images/masterpiece/fairy_string_lights.png"
+      }
+    ],
+    "payment_id": "pay_rokg26siovs",
+    "payment_status": "paid",
+    "placed_at": "2026-11-08T22:29:33.578Z",
+    "createdAt": "2026-11-08T22:29:33.591Z",
+    "updatedAt": "2026-11-08T23:57:22.594Z",
+    "__v": 0,
+    "cancelled_at": "2026-11-08T23:57:22.592Z",
+    "cancelled_by": "user"
+  }
+]

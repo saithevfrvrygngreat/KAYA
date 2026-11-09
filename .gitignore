@@ -22,9 +22,8 @@ Frontend/.env.*
 !.env.example
 !Backend/.env.example
 
-# Local MongoDB data, backups & dumps
+# Local MongoDB data & system temp
 .mongodb_data/
-Backend/backup_local_mongodb/
 server/data/
 server/uploads/
 *.log
