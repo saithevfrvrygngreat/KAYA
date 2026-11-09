@@ -1,0 +1,14 @@
+{
+    "name": "kaya-mern",
+    "version": "2.0.0",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "start": "node Backend/server.js",
+        "dev": "node run-dev.js",
+        "server": "node Backend/server.js",
+        "client": "npm run dev --prefix Frontend",
+        "build": "npm run build --prefix Frontend",
+        "seed": "node Backend/src/utils/seed_master.js"
+    }
+}

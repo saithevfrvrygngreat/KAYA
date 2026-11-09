@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+*/node_modules/
+Frontend/node_modules/
+Backend/node_modules/
+client/node_modules/
+server/node_modules/
+
+# Production builds
+dist/
+Frontend/dist/
+client/dist/
+
+# Environment files with secrets
+.env
+.env.*
+*.env
+Backend/.env
+Backend/.env.*
+Frontend/.env
+Frontend/.env.*
+
+# Local MongoDB data, backups & dumps
+.mongodb_data/
+Backend/backup_local_mongodb/
+server/data/
+server/uploads/
+*.log
+scratch/
+step_*.txt
+
+# System files & IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Legacy backup
+_legacy_laravel_backup/
