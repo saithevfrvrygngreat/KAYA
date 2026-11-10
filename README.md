@@ -7,7 +7,7 @@
 [![Vite](https://img.shields.io/badge/Vite-v5.x-purple.svg?style=flat-square&logo=vite)](https://vitejs.dev)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v3.x-38bdf8.svg?style=flat-square&logo=tailwind-css)](https://tailwindcss.com)
 
-**KAYA** has been completely migrated from **Laravel (PHP) + SQL** to the full **MERN stack (MongoDB, Express.js, React.js, Node.js)**. 100% of the original luxury design aesthetic, features, workflows, and business logic have been preserved, with zero runtime dependency on PHP, Laravel, or SQLite.
+**KAYA** 100% of the original luxury design aesthetic, features, workflows, and business logic have been preserved, with zero runtime dependency on PHP, Laravel, or SQLite.
 
 > 🎓 **NoSQL Project Presentation & Viva Package:**
 > A complete presentation script, slide-by-slide guide, ER diagrams, and **25 in-depth NoSQL viva questions & answers** are available in [**`MONGODB_README.md`**](MONGODB_README.md).
