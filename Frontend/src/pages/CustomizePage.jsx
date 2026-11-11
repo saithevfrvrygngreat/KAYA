@@ -104,7 +104,7 @@ export default function CustomizePage() {
       .then((res) => {
         const prod = res.data.data
         if (!prod.in_stock) {
-          navigate('/products', {
+          navigate('/customize', {
             state: {
               flash: {
                 type: 'error',
@@ -153,7 +153,7 @@ export default function CustomizePage() {
       })
       .catch((err) => {
         console.error(err)
-        navigate('/products')
+        navigate('/customize')
       })
       .finally(() => setLoading(false))
   }, [id])
@@ -1156,7 +1156,7 @@ export default function CustomizePage() {
     <div className="max-w-7xl mx-auto px-6 md:px-12 py-10">
       <div className="mb-8">
         <Link
-          to="/products"
+          to="/customize"
           className="inline-flex items-center gap-2 text-stone-500 hover:text-emerald-800 dark:hover:text-white transition-colors font-semibold text-sm mb-4"
         >
           <span className="material-symbols-outlined text-[18px]">arrow_back</span>
