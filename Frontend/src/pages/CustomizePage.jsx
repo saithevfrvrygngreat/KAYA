@@ -148,7 +148,8 @@ export default function CustomizePage() {
             productBaseImageRef.current = img
             renderCanvas()
           }
-          img.src = cutoutPath
+          const cacheBuster = cutoutPath.includes('?') ? cutoutPath : `${cutoutPath}?v=${Date.now()}`
+          img.src = cacheBuster
         }
       })
       .catch((err) => {
@@ -308,24 +309,43 @@ export default function CustomizePage() {
     } else {
       // Table lamp - exactly matching the second image with border lighting and no photo background
       ctx.save()
-      const cx = fX + fWidth / 2
+      
+      let drawW = fWidth
+      let drawH = fHeight
+      let drawX = fX
+      let drawY = fY
+      if (productBaseImageRef.current) {
+        const img = productBaseImageRef.current
+        if (img.width && img.height) {
+          const aspect = img.width / img.height
+          if (fWidth / fHeight > aspect) {
+            drawW = Math.round(fHeight * aspect)
+          } else {
+            drawH = Math.round(fWidth / aspect)
+          }
+          drawX = fX + Math.round((fWidth - drawW) / 2)
+          drawY = fY + Math.round(fHeight - drawH)
+        }
+      }
 
-      // Ambient warm border lighting glow
-      const glowGrad = ctx.createRadialGradient(cx, fY + fHeight * 0.22, 15, cx, fY + fHeight * 0.22, fWidth * 0.95)
+      const cx = drawX + drawW / 2
+
+      // Ambient warm border lighting glow centered on lamp shade
+      const glowGrad = ctx.createRadialGradient(cx, drawY + drawH * 0.24, 15, cx, drawY + drawH * 0.24, drawW * 0.95)
       glowGrad.addColorStop(0, 'rgba(255, 253, 230, 0.95)')
       glowGrad.addColorStop(0.3, hexToRgba(color, 0.55))
       glowGrad.addColorStop(0.7, hexToRgba(color, 0.14))
       glowGrad.addColorStop(1, 'rgba(0,0,0,0)')
       ctx.fillStyle = glowGrad
       ctx.beginPath()
-      ctx.arc(cx, fY + fHeight * 0.22, fWidth * 0.95, 0, Math.PI * 2)
+      ctx.arc(cx, drawY + drawH * 0.24, drawW * 0.95, 0, Math.PI * 2)
       ctx.fill()
 
       // Soft contact drop shadow on table/surface
       ctx.save()
       ctx.fillStyle = 'rgba(0, 0, 0, 0.35)'
       ctx.beginPath()
-      ctx.ellipse(cx, fY + fHeight - 4, fWidth * 0.28, 9, 0, 0, Math.PI * 2)
+      ctx.ellipse(cx, drawY + drawH - 4, drawW * 0.3, 9, 0, 0, Math.PI * 2)
       ctx.fill()
       ctx.restore()
 
@@ -336,7 +356,7 @@ export default function CustomizePage() {
 
       // Draw the isolated cutout lamp
       if (productBaseImageRef.current) {
-        ctx.drawImage(productBaseImageRef.current, fX, fY, fWidth, fHeight)
+        ctx.drawImage(productBaseImageRef.current, drawX, drawY, drawW, drawH)
       }
       ctx.restore()
 
@@ -344,13 +364,13 @@ export default function CustomizePage() {
       if (generatedAiImage) {
         ctx.save()
         ctx.globalAlpha = 0.58
-        ctx.drawImage(generatedAiImage, fX + fWidth * 0.03, fY + fHeight * 0.02, fWidth * 0.94, fHeight * 0.44)
+        ctx.drawImage(generatedAiImage, drawX + drawW * 0.05, drawY + drawH * 0.03, drawW * 0.9, drawH * 0.42)
         ctx.restore()
       } else if (color && color !== '#064e3b' && color !== '#1c1917') {
         ctx.save()
         ctx.globalCompositeOperation = 'multiply'
         ctx.fillStyle = hexToRgba(color, 0.25)
-        ctx.fillRect(fX + fWidth * 0.03, fY + fHeight * 0.02, fWidth * 0.94, fHeight * 0.44)
+        ctx.fillRect(drawX + drawW * 0.05, drawY + drawH * 0.03, drawW * 0.9, drawH * 0.42)
         ctx.restore()
       }
       ctx.restore()
