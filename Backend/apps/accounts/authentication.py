@@ -139,3 +139,4 @@ class JWTAuthenticationMiddleware:
             except Exception:
                 pass
         return self.get_response(request)
+

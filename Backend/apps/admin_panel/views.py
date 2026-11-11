@@ -267,3 +267,4 @@ def destroy_product(request, id):
         return Response({'message': f"Masterpiece curation '{name}' has been completely deleted and removed from all lists!"})
     except Exception as e:
         return Response({'message': 'Failed to delete product.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+

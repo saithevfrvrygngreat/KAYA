@@ -54,3 +54,4 @@ def send_password_reset_otp_email(to_email, otp):
     except Exception as e:
         print(f"⚠️ [EmailService] SMTP error ({str(e)}). OTP logged to console.")
         return {'sent': False, 'error': str(e), 'otp': otp}
+

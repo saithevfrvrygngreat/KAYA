@@ -265,3 +265,4 @@ Respond with a valid JSON object ONLY containing:
         })
     except Exception as e:
         return Response({'message': 'Room analysis failed.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+

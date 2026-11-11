@@ -83,7 +83,17 @@ AUTH_USER_MODEL = 'accounts.User'
 # Database: SQLite
 db_path = os.getenv('DATABASE_PATH')
 if db_path:
-    DB_FILE = Path(db_path)
+    p = Path(db_path)
+    if p.is_absolute():
+        DB_FILE = p
+    elif (BASE_DIR / p).exists():
+        DB_FILE = BASE_DIR / p
+    elif (BASE_DIR / p.name).exists():
+        DB_FILE = BASE_DIR / p.name
+    elif (BASE_DIR.parent / p).exists():
+        DB_FILE = BASE_DIR.parent / p
+    else:
+        DB_FILE = BASE_DIR / p.name
 else:
     DB_FILE = BASE_DIR / 'db.sqlite3'
 
@@ -174,3 +184,4 @@ if SMTP_HOST and SMTP_USER:
     EMAIL_HOST_PASSWORD = SMTP_PASS
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+

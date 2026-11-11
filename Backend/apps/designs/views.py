@@ -133,3 +133,4 @@ def upload_room_image(request):
         }, status=status.HTTP_201_CREATED)
     except Exception as e:
         return Response({'message': 'Failed to upload image.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
