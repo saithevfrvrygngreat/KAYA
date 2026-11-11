@@ -48,6 +48,7 @@ async function start() {
   const serverProc = spawn(pythonCmd, ['Backend/manage.py', 'runserver', '0.0.0.0:5000'], {
     cwd: __dirname,
     stdio: 'pipe',
+    env: { ...process.env, PYTHONUNBUFFERED: '1' },
   });
   children.push(serverProc);
 

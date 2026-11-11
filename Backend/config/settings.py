@@ -134,6 +134,9 @@ if FRONTEND_DIST_DIR.exists():
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Disable automatic 301 redirects on trailing slashes for clean SPA REST APIs
+APPEND_SLASH = False
+
 # CORS Settings
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True

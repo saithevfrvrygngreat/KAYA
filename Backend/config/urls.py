@@ -44,13 +44,13 @@ urlpatterns = [
     # Health check
     re_path(r'^api/health/?$', health_check, name='api-health'),
 
-    # API endpoints
-    re_path(r'^api/auth', include('apps.accounts.urls')),
-    re_path(r'^api/products', include('apps.products.urls')),
-    re_path(r'^api/orders', include('apps.orders.urls')),
-    re_path(r'^api/designs', include('apps.designs.urls')),
-    re_path(r'^api/ai', include('apps.ai_services.urls')),
-    re_path(r'^api/admin', include('apps.admin_panel.urls')),
+    # API endpoints (matches both with and without trailing slash)
+    re_path(r'^api/auth/?', include('apps.accounts.urls')),
+    re_path(r'^api/products/?', include('apps.products.urls')),
+    re_path(r'^api/orders/?', include('apps.orders.urls')),
+    re_path(r'^api/designs/?', include('apps.designs.urls')),
+    re_path(r'^api/ai/?', include('apps.ai_services.urls')),
+    re_path(r'^api/admin/?', include('apps.admin_panel.urls')),
 
     # Any unmatched /api/* returns JSON 404
     re_path(r'^api/(?P<path>.*)$', api_404),
