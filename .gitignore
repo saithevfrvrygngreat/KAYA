@@ -38,3 +38,16 @@ Thumbs.db
 
 # Legacy backup
 _legacy_laravel_backup/
+Backend_node_backup/
+
+# Python & Django
+staticfiles/
+Backend/staticfiles/
+__pycache__/
+*.py[cod]
+*$py.class
+*.sqlite3-journal
+.venv/
+env/
+venv/
+ENV/

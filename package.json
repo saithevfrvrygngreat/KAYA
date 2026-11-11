@@ -1,14 +1,15 @@
 {
-    "name": "kaya-mern",
-    "version": "2.0.0",
+    "name": "kaya-django-sqlite",
+    "version": "3.0.0",
     "private": true,
     "type": "module",
     "scripts": {
-        "start": "node Backend/server.js",
+        "start": "python Backend/manage.py runserver 0.0.0.0:5000",
         "dev": "node run-dev.js",
-        "server": "node Backend/server.js",
+        "server": "python Backend/manage.py runserver 0.0.0.0:5000",
         "client": "npm run dev --prefix Frontend",
         "build": "npm run build --prefix Frontend",
-        "seed": "node Backend/src/utils/seed_master.js"
+        "migrate": "python Backend/manage.py migrate",
+        "test:api": "python Backend/scripts/verify_all_endpoints.py"
     }
 }

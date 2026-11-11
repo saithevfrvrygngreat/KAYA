@@ -5,7 +5,7 @@ FROM node:20-slim AS frontend-build
 
 WORKDIR /app/Frontend
 
-# Copy dependency specifications
+# Copy frontend dependency specifications
 COPY Frontend/package*.json ./
 
 # Install frontend dependencies cleanly
@@ -19,34 +19,42 @@ RUN npm run build
 
 
 # ==========================================================
-# STAGE 2: Production Express Backend & Asset Server
+# STAGE 2: Production Python / Django Backend & Asset Server
 # ==========================================================
-FROM node:20-slim AS production
+FROM python:3.12-slim AS production
 
-# Install system certificates and OpenSSL for reliable TLS to MongoDB Atlas
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates openssl wget && rm -rf /var/lib/apt/lists/*
+# Install system dependencies (certificates, sqlite, build tools)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    curl \
+    gcc \
+    libsqlite3-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-ENV NODE_ENV=production
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PORT=10000
 
-# Copy backend dependency specifications
-COPY Backend/package*.json ./Backend/
+# Copy Python requirements and install
+COPY Backend/requirements.txt ./Backend/
+RUN pip install --no-cache-dir -r ./Backend/requirements.txt
 
-# Install only production backend dependencies
-RUN cd Backend && npm ci --omit=dev
-
-# Copy backend source code
+# Copy Backend source code and initial SQLite database
 COPY Backend/ ./Backend/
 
 # Copy compiled frontend from builder stage
 COPY --from=frontend-build /app/Frontend/dist ./Frontend/dist
 
-# Render assigns and exposes PORT dynamically (defaults to 10000)
+# Ensure entrypoint is executable
+RUN chmod +x ./Backend/entrypoint.sh
+
+# Render assigns and exposes PORT dynamically
 EXPOSE 10000
 
-# Working directory for running Express
+# Set working directory to Backend
 WORKDIR /app/Backend
 
-# Start production server
-CMD ["node", "server.js"]
+# Run entrypoint script
+CMD ["./entrypoint.sh"]
